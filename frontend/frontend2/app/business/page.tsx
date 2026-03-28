@@ -5,7 +5,6 @@ import Image from "next/image"
 import Link from "next/link"
 import { TrendingUp, TrendingDown, BarChart3, Loader2, AlertCircle } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
-import { BiasLabelBadge } from "@/components/bias-label-badge"
 import type { SearchResult } from "@/lib/bias-types"
 
 const PLACEHOLDER_IMAGE = "/placeholder.jpg"
@@ -87,16 +86,10 @@ export default function BusinessPage() {
 
       <div className="bg-[#1a3a4a] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center">
             <div className="flex items-center gap-3">
               <BarChart3 className="w-5 h-5" />
               <span className="text-sm font-medium tracking-wider uppercase">Business</span>
-            </div>
-            <div className="flex items-center gap-6 text-sm">
-              <a href="#" className="hidden md:block hover:text-emerald-300 transition-colors">Markets</a>
-              <a href="#" className="hidden md:block hover:text-emerald-300 transition-colors">Economy</a>
-              <a href="#" className="hidden md:block hover:text-emerald-300 transition-colors">Companies</a>
-              <a href="#" className="hidden md:block hover:text-emerald-300 transition-colors">Tech</a>
             </div>
           </div>
         </div>
@@ -153,7 +146,6 @@ export default function BusinessPage() {
                     <div className="absolute bottom-0 left-0 right-0 p-6 lg:p-8">
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-xs font-medium tracking-widest uppercase text-white/70">{featured.source}</span>
-                        <BiasLabelBadge label={featured.biasLabel} />
                       </div>
                       <h2 className="font-serif text-2xl md:text-3xl lg:text-4xl text-white leading-tight mb-2">
                         {featured.title}
@@ -176,7 +168,6 @@ export default function BusinessPage() {
                   <div className="p-5">
                     <div className="flex items-center gap-2 mb-2">
                       <span className="text-xs font-medium tracking-wider uppercase text-muted-foreground">{article.source}</span>
-                      <BiasLabelBadge label={article.biasLabel} />
                     </div>
                     <h3 className="font-serif text-lg text-foreground leading-snug group-hover:text-[#1a3a4a] transition-colors mb-1">
                       {article.title}

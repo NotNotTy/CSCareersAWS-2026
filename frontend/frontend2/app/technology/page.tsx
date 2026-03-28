@@ -3,20 +3,11 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Cpu, Smartphone, Cloud, Shield, Sparkles, Code, Loader2, AlertCircle } from "lucide-react"
+import { Cpu, Loader2, AlertCircle } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
-import { BiasLabelBadge } from "@/components/bias-label-badge"
 import type { SearchResult } from "@/lib/bias-types"
 
 const PLACEHOLDER_IMAGE = "/placeholder.jpg"
-
-const techCategories = [
-  { name: "AI & ML", icon: Sparkles, color: "bg-purple-500" },
-  { name: "Mobile", icon: Smartphone, color: "bg-blue-500" },
-  { name: "Cloud", icon: Cloud, color: "bg-cyan-500" },
-  { name: "Security", icon: Shield, color: "bg-emerald-500" },
-  { name: "Developer", icon: Code, color: "bg-orange-500" },
-]
 
 function articleImage(image: string | null): string {
   return image || PLACEHOLDER_IMAGE
@@ -54,16 +45,10 @@ export default function TechnologyPage() {
     <div className="min-h-screen bg-[#0a0a0a]">
       <div className="bg-gradient-to-r from-purple-900 via-violet-800 to-indigo-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center">
             <div className="flex items-center gap-3">
               <Cpu className="w-5 h-5" />
               <span className="text-sm font-medium tracking-wider uppercase">Technology</span>
-            </div>
-            <div className="flex items-center gap-6 text-sm">
-              <a href="#" className="hidden md:block hover:text-purple-200 transition-colors">AI</a>
-              <a href="#" className="hidden md:block hover:text-purple-200 transition-colors">Software</a>
-              <a href="#" className="hidden md:block hover:text-purple-200 transition-colors">Hardware</a>
-              <a href="#" className="hidden md:block hover:text-purple-200 transition-colors">Startups</a>
             </div>
           </div>
         </div>
@@ -78,18 +63,6 @@ export default function TechnologyPage() {
             The latest in AI, software, hardware, and the innovations shaping our digital future.
           </p>
         </header>
-
-        <section className="flex flex-wrap gap-3 mb-10">
-          {techCategories.map((cat) => (
-            <a key={cat.name} href="#"
-              className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full hover:bg-white/10 transition-colors group">
-              <span className={`p-1 rounded ${cat.color}`}>
-                <cat.icon className="w-4 h-4 text-white" />
-              </span>
-              <span className="text-sm font-medium text-gray-300 group-hover:text-white transition-colors">{cat.name}</span>
-            </a>
-          ))}
-        </section>
 
         {loading && (
           <div className="flex flex-col items-center gap-3 py-32">
@@ -119,7 +92,6 @@ export default function TechnologyPage() {
                         <span className="px-3 py-1 bg-purple-600 text-white text-xs font-medium tracking-wider uppercase rounded-full">
                           {featured.source}
                         </span>
-                        <BiasLabelBadge label={featured.biasLabel} />
                       </div>
                       <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-white leading-tight mb-4">
                         {featured.title}
@@ -142,7 +114,6 @@ export default function TechnologyPage() {
                       <span className="px-2 py-1 bg-black/60 backdrop-blur text-white text-xs font-medium rounded">
                         {article.source}
                       </span>
-                      <BiasLabelBadge label={article.biasLabel} />
                     </div>
                   </div>
                   <div className="p-5">

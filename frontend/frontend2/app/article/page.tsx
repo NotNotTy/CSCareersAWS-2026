@@ -81,13 +81,13 @@ function ArticleContent() {
 
       <main className="flex-1 flex flex-col max-w-6xl mx-auto w-full px-4 sm:px-6 py-6">
         {/* Back link */}
-        <Link
-          href="/"
+        <button
+          onClick={() => window.history.back()}
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to Search
-        </Link>
+          Back
+        </button>
 
         {/* Loading state */}
         {loading && (

@@ -5,7 +5,6 @@ import Image from "next/image"
 import Link from "next/link"
 import { FlaskConical, Loader2, AlertCircle } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
-import { BiasLabelBadge } from "@/components/bias-label-badge"
 import type { SearchResult } from "@/lib/bias-types"
 
 const PLACEHOLDER_IMAGE = "/placeholder.jpg"
@@ -46,16 +45,10 @@ export default function SciencePage() {
     <div className="min-h-screen bg-[#f0f4f3]">
       <div className="bg-[#1e5245] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center">
             <div className="flex items-center gap-3">
               <FlaskConical className="w-5 h-5" />
               <span className="text-sm font-medium tracking-wider uppercase">Science</span>
-            </div>
-            <div className="flex items-center gap-6 text-sm">
-              <a href="#" className="hidden md:block hover:text-emerald-200 transition-colors">Space</a>
-              <a href="#" className="hidden md:block hover:text-emerald-200 transition-colors">Health</a>
-              <a href="#" className="hidden md:block hover:text-emerald-200 transition-colors">Climate</a>
-              <a href="#" className="hidden md:block hover:text-emerald-200 transition-colors">Biology</a>
             </div>
           </div>
         </div>
@@ -99,7 +92,6 @@ export default function SciencePage() {
                       <span className="px-3 py-1 bg-[#1e5245] text-white text-xs font-medium tracking-wider uppercase rounded">
                         {featured.source}
                       </span>
-                      <BiasLabelBadge label={featured.biasLabel} />
                     </div>
                     <h2 className="font-serif text-3xl md:text-4xl text-foreground leading-tight mb-4">
                       {featured.title}
@@ -121,7 +113,6 @@ export default function SciencePage() {
                       <span className="px-2 py-1 bg-white/90 backdrop-blur text-[#1e5245] text-xs font-medium rounded">
                         {article.source}
                       </span>
-                      <BiasLabelBadge label={article.biasLabel} />
                     </div>
                   </div>
                   <div className="p-5">

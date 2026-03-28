@@ -3,21 +3,11 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Film, Music, Book, Palette, Theater, Camera, Loader2, AlertCircle } from "lucide-react"
+import { Palette, Loader2, AlertCircle } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
-import { BiasLabelBadge } from "@/components/bias-label-badge"
 import type { SearchResult } from "@/lib/bias-types"
 
 const PLACEHOLDER_IMAGE = "/placeholder.jpg"
-
-const categories = [
-  { name: "Film", icon: Film },
-  { name: "Music", icon: Music },
-  { name: "Books", icon: Book },
-  { name: "Art", icon: Palette },
-  { name: "Theater", icon: Theater },
-  { name: "Photo", icon: Camera },
-]
 
 function articleImage(image: string | null): string {
   return image || PLACEHOLDER_IMAGE
@@ -55,16 +45,10 @@ export default function CulturePage() {
     <div className="min-h-screen bg-[#fdfbf7]">
       <div className="bg-[#c47d5b] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center">
             <div className="flex items-center gap-3">
               <Palette className="w-5 h-5" />
               <span className="text-sm font-medium tracking-wider uppercase">Culture</span>
-            </div>
-            <div className="flex items-center gap-6 text-sm">
-              <a href="#" className="hidden md:block hover:text-orange-100 transition-colors">Film</a>
-              <a href="#" className="hidden md:block hover:text-orange-100 transition-colors">Music</a>
-              <a href="#" className="hidden md:block hover:text-orange-100 transition-colors">Art</a>
-              <a href="#" className="hidden md:block hover:text-orange-100 transition-colors">Books</a>
             </div>
           </div>
         </div>
@@ -79,19 +63,6 @@ export default function CulturePage() {
             Art, film, music, literature, and the creative expressions that define our time.
           </p>
         </header>
-
-        <section className="flex flex-wrap justify-center gap-8 mb-12">
-          {categories.map((cat) => (
-            <a key={cat.name} href="#" className="flex flex-col items-center gap-2 group">
-              <div className="w-16 h-16 rounded-full bg-[#c47d5b]/10 flex items-center justify-center group-hover:bg-[#c47d5b] transition-colors">
-                <cat.icon className="w-7 h-7 text-[#c47d5b] group-hover:text-white transition-colors" />
-              </div>
-              <span className="text-sm font-medium text-muted-foreground group-hover:text-[#8b4513] transition-colors">
-                {cat.name}
-              </span>
-            </a>
-          ))}
-        </section>
 
         {loading && (
           <div className="flex flex-col items-center gap-3 py-32">
@@ -121,7 +92,6 @@ export default function CulturePage() {
                         <span className="text-[#e8a87c] text-sm font-medium tracking-widest uppercase">
                           {featured.source}
                         </span>
-                        <BiasLabelBadge label={featured.biasLabel} />
                       </div>
                       <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-white leading-tight mb-4 italic">
                         {featured.title}
@@ -145,7 +115,6 @@ export default function CulturePage() {
                     <div className="flex items-center gap-2 mb-2">
                       <span className="w-8 h-0.5 bg-[#c47d5b]"></span>
                       <span className="text-xs text-[#c47d5b] font-medium uppercase tracking-wider">{article.source}</span>
-                      <BiasLabelBadge label={article.biasLabel} />
                     </div>
                     <h3 className="font-serif text-xl text-foreground leading-snug mb-3 group-hover:text-[#8b4513] transition-colors italic">
                       {article.title}

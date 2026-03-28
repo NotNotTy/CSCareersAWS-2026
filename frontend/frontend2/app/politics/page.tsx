@@ -5,7 +5,6 @@ import Image from "next/image"
 import Link from "next/link"
 import { Landmark, Loader2, AlertCircle } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
-import { BiasLabelBadge } from "@/components/bias-label-badge"
 import type { SearchResult } from "@/lib/bias-types"
 
 const PLACEHOLDER_IMAGE = "/placeholder.jpg"
@@ -46,16 +45,10 @@ export default function PoliticsPage() {
     <div className="min-h-screen bg-[#faf9f7]">
       <div className="bg-[#8b0000] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center">
             <div className="flex items-center gap-3">
               <Landmark className="w-5 h-5" />
               <span className="text-sm font-medium tracking-wider uppercase">Politics</span>
-            </div>
-            <div className="flex items-center gap-6 text-sm">
-              <a href="#" className="hidden md:block hover:text-red-200 transition-colors">Congress</a>
-              <a href="#" className="hidden md:block hover:text-red-200 transition-colors">White House</a>
-              <a href="#" className="hidden md:block hover:text-red-200 transition-colors">Judiciary</a>
-              <a href="#" className="hidden md:block hover:text-red-200 transition-colors">Elections</a>
             </div>
           </div>
         </div>
@@ -97,7 +90,6 @@ export default function PoliticsPage() {
                     <div className="absolute bottom-0 left-0 right-0 p-6 lg:p-8">
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-xs font-medium tracking-widest uppercase text-white/70">{featured.source}</span>
-                        <BiasLabelBadge label={featured.biasLabel} />
                       </div>
                       <h2 className="font-serif text-2xl md:text-3xl lg:text-4xl text-white leading-tight mb-2">
                         {featured.title}
@@ -122,7 +114,6 @@ export default function PoliticsPage() {
                     <div className="md:col-span-3">
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-xs font-bold tracking-widest uppercase text-[#8b0000]">{article.source}</span>
-                        <BiasLabelBadge label={article.biasLabel} />
                       </div>
                       <h3 className="font-serif text-xl md:text-2xl text-foreground leading-snug mb-3 group-hover:text-[#8b0000] transition-colors">
                         {article.title}

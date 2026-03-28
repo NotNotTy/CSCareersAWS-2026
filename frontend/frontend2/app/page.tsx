@@ -1,37 +1,79 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Search, Loader2, AlertCircle, ArrowRight } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
-import { BiasLabelBadge } from "@/components/bias-label-badge"
-import type { SearchResult } from "@/lib/bias-types"
+import { BiasScaleBar } from "@/components/bias-scale-bar"
+import type { SearchResult, BiasAnalysisResult } from "@/lib/bias-types"
 
 const DEFAULT_QUERY = "top news today"
-
 const PLACEHOLDER_IMAGE = "/placeholder.jpg"
 
-function articleImage(image: string | null, fallbackIndex: number): string {
-  if (image) return image
-  return PLACEHOLDER_IMAGE
+function articleImage(image: string | null): string {
+  return image || PLACEHOLDER_IMAGE
 }
 
-export default function HomePage() {
+function HomeContent() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [query, setQuery] = useState("")
   const [results, setResults] = useState<SearchResult[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [lastQuery, setLastQuery] = useState("")
   const [searchOpen, setSearchOpen] = useState(false)
+  const [featuredAnalysis, setFeaturedAnalysis] = useState<BiasAnalysisResult | null>(null)
+  const [featuredAnalyzing, setFeaturedAnalyzing] = useState(false)
 
-  async function runSearch(q: string) {
+  async function analyzeFeatured(article: SearchResult) {
+    setFeaturedAnalysis(null)
+    setFeaturedAnalyzing(true)
+    try {
+      // Step 1: parse the article
+      const parseRes = await fetch("/api/parse-article", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: article.url }),
+      })
+      if (!parseRes.ok) return
+      const parsed = await parseRes.json()
+
+      // Step 2: full bias analysis
+      const analyzeRes = await fetch("/api/analyze-bias", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: parsed.title,
+          textContent: parsed.textContent,
+          siteName: parsed.siteName,
+          mode: "full",
+        }),
+      })
+      if (!analyzeRes.ok) return
+      const analysis: BiasAnalysisResult = await analyzeRes.json()
+      setFeaturedAnalysis(analysis)
+    } catch {
+      // silently fail — the card still works without the badge
+    } finally {
+      setFeaturedAnalyzing(false)
+    }
+  }
+
+  async function runSearch(q: string, updateUrl = true) {
     if (!q.trim()) return
     setSearchOpen(false)
     setLoading(true)
     setError(null)
     setLastQuery(q)
     setQuery("")
+    if (updateUrl) {
+      const params = new URLSearchParams()
+      if (q !== DEFAULT_QUERY) params.set("q", q)
+      router.replace(`/?${params.toString()}`, { scroll: false })
+    }
     try {
       const res = await fetch("/api/search", {
         method: "POST",
@@ -43,7 +85,9 @@ export default function HomePage() {
         throw new Error(data.error ?? `Search failed (${res.status})`)
       }
       const data = await res.json()
-      setResults(data.results ?? [])
+      const articles = data.results ?? []
+      setResults(articles)
+      if (articles.length > 0) analyzeFeatured(articles[0])
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Something went wrong")
       setResults([])
@@ -52,7 +96,10 @@ export default function HomePage() {
     }
   }
 
-  useEffect(() => { runSearch(DEFAULT_QUERY) }, [])
+  useEffect(() => {
+    const q = searchParams.get("q") || DEFAULT_QUERY
+    runSearch(q, false)
+  }, [])
 
   const featured = results[0]
   const topStories = results.slice(1, 4)
@@ -144,18 +191,32 @@ export default function HomePage() {
                 <div className="lg:col-span-2">
                   <Link href={`/article?url=${encodeURIComponent(featured.url)}`} className="group block">
                     <div className="relative aspect-[16/10] overflow-hidden mb-4">
-                      <Image src={articleImage(featured.image, 0)} alt={featured.title} fill
+                      <Image src={articleImage(featured.image)} alt={featured.title} fill
                         className="object-cover transition-transform duration-500 group-hover:scale-105" />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
                       <div className="absolute bottom-0 left-0 right-0 p-6 lg:p-8">
                         <div className="flex items-center gap-2 mb-2">
                           <span className="text-xs font-medium tracking-widest uppercase text-white/70">{featured.source}</span>
-                          <BiasLabelBadge label={featured.biasLabel} />
                         </div>
                         <h2 className="font-serif text-2xl md:text-3xl lg:text-4xl text-white leading-tight mb-2">
                           {featured.title}
                         </h2>
                         <p className="text-white/80 text-sm md:text-base line-clamp-2 max-w-2xl">{featured.snippet}</p>
+                        {/* Bias score for featured article */}
+                        <div className="mt-3" onClick={(e) => e.preventDefault()}>
+                          {featuredAnalyzing && (
+                            <div className="flex items-center gap-2 text-white/60 text-xs">
+                              <Loader2 className="w-3 h-3 animate-spin" />
+                              Analyzing bias…
+                            </div>
+                          )}
+                          {featuredAnalysis && (
+                            <div className="bg-black/40 backdrop-blur rounded-lg px-4 py-3 inline-block">
+                              <p className="text-xs font-semibold text-white/60 uppercase tracking-wide mb-2">Political Bias</p>
+                              <BiasScaleBar rating={featuredAnalysis.biasScale} />
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </Link>
@@ -169,13 +230,12 @@ export default function HomePage() {
                   <Link key={i} href={`/article?url=${encodeURIComponent(article.url)}`}
                     className="group flex gap-3 items-start">
                     <div className="relative w-20 h-16 flex-shrink-0 overflow-hidden">
-                      <Image src={articleImage(article.image, i)} alt={article.title} fill
+                      <Image src={articleImage(article.image)} alt={article.title} fill
                         className="object-cover transition-transform duration-300 group-hover:scale-105" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1 mb-1">
                         <span className="text-xs text-muted-foreground truncate">{article.source}</span>
-                        <BiasLabelBadge label={article.biasLabel} />
                       </div>
                       <p className="text-sm font-medium text-foreground group-hover:text-blue-600 transition-colors leading-snug line-clamp-2">
                         {article.title}
@@ -191,21 +251,16 @@ export default function HomePage() {
               <section className="mb-12">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="font-serif text-2xl text-foreground">Top Stories</h2>
-                  <span className="text-xs font-medium tracking-widest uppercase text-muted-foreground">
-                    Grade · Bias
-                  </span>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {topStories.map((article, i) => (
                     <Link key={i} href={`/article?url=${encodeURIComponent(article.url)}`} className="group block">
                       <div className="relative aspect-[4/3] overflow-hidden mb-3">
-                        <Image src={articleImage(article.image, i)} alt={article.title} fill
+                        <Image src={articleImage(article.image)} alt={article.title} fill
                           className="object-cover transition-transform duration-500 group-hover:scale-105" />
                       </div>
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-xs font-medium tracking-wider uppercase text-muted-foreground">{article.source}</span>
-                        <BiasLabelBadge label={article.biasLabel} />
-                        <span className="text-xs text-muted-foreground">· {article.accuracyGrade}</span>
                       </div>
                       <h3 className="font-serif text-lg text-foreground leading-snug group-hover:text-blue-600 transition-colors mb-1">
                         {article.title}
@@ -231,12 +286,11 @@ export default function HomePage() {
                   {bottomGrid.map((article, i) => (
                     <Link key={i} href={`/article?url=${encodeURIComponent(article.url)}`} className="group block">
                       <div className="relative aspect-[4/3] overflow-hidden mb-3">
-                        <Image src={articleImage(article.image, i)} alt={article.title} fill
+                        <Image src={articleImage(article.image)} alt={article.title} fill
                           className="object-cover transition-transform duration-500 group-hover:scale-105" />
                       </div>
                       <div className="flex items-center gap-1 mb-1">
                         <span className="text-xs text-muted-foreground truncate">{article.source}</span>
-                        <BiasLabelBadge label={article.biasLabel} />
                       </div>
                       <h3 className="font-serif text-base text-foreground leading-snug group-hover:text-blue-600 transition-colors line-clamp-2">
                         {article.title}
@@ -321,5 +375,17 @@ export default function HomePage() {
         </div>
       </footer>
     </div>
+  )
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      </div>
+    }>
+      <HomeContent />
+    </Suspense>
   )
 }

@@ -5,7 +5,6 @@ import Image from "next/image"
 import Link from "next/link"
 import { Globe, Loader2, AlertCircle } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
-import { BiasLabelBadge } from "@/components/bias-label-badge"
 import type { SearchResult } from "@/lib/bias-types"
 
 const PLACEHOLDER_IMAGE = "/placeholder.jpg"
@@ -46,18 +45,10 @@ export default function WorldPage() {
     <div className="min-h-screen bg-[#f8f9fa]">
       <div className="bg-[#1a365d] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center">
             <div className="flex items-center gap-3">
               <Globe className="w-5 h-5" />
               <span className="text-sm font-medium tracking-wider uppercase">World News</span>
-            </div>
-            <div className="flex items-center gap-6 text-sm">
-              <a href="#" className="hidden md:block hover:text-blue-200 transition-colors">Africa</a>
-              <a href="#" className="hidden md:block hover:text-blue-200 transition-colors">Americas</a>
-              <a href="#" className="hidden md:block hover:text-blue-200 transition-colors">Asia</a>
-              <a href="#" className="hidden md:block hover:text-blue-200 transition-colors">Europe</a>
-              <a href="#" className="hidden md:block hover:text-blue-200 transition-colors">Middle East</a>
-              <a href="#" className="hidden md:block hover:text-blue-200 transition-colors">Oceania</a>
             </div>
           </div>
         </div>
@@ -99,7 +90,6 @@ export default function WorldPage() {
                     <div className="absolute bottom-0 left-0 right-0 p-6 lg:p-8">
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-xs font-medium tracking-widest uppercase text-white/70">{featured.source}</span>
-                        <BiasLabelBadge label={featured.biasLabel} />
                       </div>
                       <h2 className="font-serif text-2xl md:text-3xl lg:text-4xl text-white leading-tight mb-2">
                         {featured.title}
@@ -121,7 +111,6 @@ export default function WorldPage() {
                   </div>
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-xs font-medium text-[#1a365d] tracking-wider uppercase">{article.source}</span>
-                    <BiasLabelBadge label={article.biasLabel} />
                   </div>
                   <h3 className="font-serif text-xl text-foreground leading-snug group-hover:text-[#1a365d] transition-colors">
                     {article.title}
